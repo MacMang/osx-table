@@ -1,0 +1,23 @@
+{
+  "name": "osx-table",
+  "version": "1.0.0",
+  "description": "",
+  "main": "table-mixin.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MacMang/osx-table.git"
+  },
+  "keywords": [
+    "vue",
+    "可编辑表格"
+  ],
+  "author": "朱蒙托",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MacMang/osx-table/issues"
+  },
+  "homepage": "https://github.com/MacMang/osx-table#readme"
+}
