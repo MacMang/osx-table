@@ -38,40 +38,6 @@
           </li>
         </ul>
     </li>
-    <li @mouseover="showTrStyle=true" @mouseout="showTrStyle=false">
-      表格底纹
-        <ul class="trStyle" v-show="showTrStyle">
-          <!-- <li @mouseover="showOddEvenStyle=true" @mouseout="showOddEvenStyle=false">
-            表格隔行变色
-            <ul class="colorUL" id="colorUL" v-show="showOddEvenStyle">
-              <li @click.stop="setOddColor">
-                奇数行颜色
-                <i
-                  class="fa fa-square"
-                  :style="{color:oddColorObj.color}"
-                  @click.stop="showPiker('odd')"
-                ></i>
-              </li>
-              <li @click.stop="setEvenColor">
-                偶数行颜色
-                <i
-                  class="fa fa-square"
-                  :style="{color:evenColorObject.color}"
-                  @click.stop="showPiker('even')"
-                ></i>
-              </li>
-              <colorpicker v-if="showColorPicker" :colorObj="colorObj" @changeColor="changeColor" />
-            </ul>
-          </li> -->
-          <li @click.stop="showColorPicker=true" @mouseenter="showCurrentRowStyle=true" @mouseleave="showCurrentRowStyle=false">设置当前行
-            <ul class="colorUL" v-show="showCurrentRowStyle">
-              <li  style="width:200px;height:200px">
-                  <colorpicker v-if="showCurrentRowStyle" :colorObj="colorObj" @changeColor="setCurrentLineColor" />
-              </li>
-            </ul>
-          </li>
-        </ul>
-    </li>
     <li @click="mergeTd(),hideMenu()">合并单元格</li>
     <li @click.stop="$emit('update:isOpenCssDialog',true)">其他样式</li>
   </ul>
@@ -209,8 +175,10 @@ export default {
   methods: {
     addNewOne(index, event) {
       const table = this.$parent.$refs["richEdit"].children[0];
+      const tbody = table.children[0];
       this.table = table;
-      const tr = table.children[this.tableInfo.rowIndex];
+      console.log("table---------",[table]);
+      const tr = tbody.children[this.tableInfo.rowIndex];
       const td = tr.children[this.tableInfo.colIndex];
       switch (index) {
         case 0:
@@ -235,6 +203,7 @@ export default {
           break;
       }
       this.$refs['menu'].style.display = "none";
+      this.$parent.changeHTML();
     },
     insertAfter(newEl, targetEl) {
       var parentEl = targetEl.parentNode;
@@ -246,7 +215,8 @@ export default {
     },
     insertTd(direction) {
       const table = this.$parent.$refs["richEdit"].children[0];
-      Array.from(table.children).forEach(item => {
+      const tbody = table.children[0];
+      Array.from(tbody.children).forEach(item => {
         var newTd = document.createElement("td");
         newTd.innerText = "-";
         newTd.style.cssText = `line-height:40px;border:1px solid lightgray`;
@@ -264,14 +234,16 @@ export default {
         }
       });
       this.$refs['menu'].style.display = "none";
+      this.$parent.changeHTML();
     },
     deleteOne(index, event) {
       const table = this.$parent.$refs["richEdit"].children[0];
-      const tr = table.children[this.tableInfo.rowIndex];
+      const tbody = table.children[0];
+      const tr = tbody.children[this.tableInfo.rowIndex];
       const td = tr.children[this.tableInfo.colIndex];
       switch (index) {
         case 0:
-          table.removeChild(tr);
+          tbody.removeChild(tr);
           break;
         case 1:
           console.log("删除当前列");
@@ -279,12 +251,12 @@ export default {
           break;
         case 2:
           if (tr.previousElementSibling) {
-            table.removeChild(tr.previousElementSibling);
+            tbody.removeChild(tr.previousElementSibling);
           }
           break;
         case 3:
           if (tr.nextElementSibling) {
-            table.removeChild(tr.nextElementSibling);
+            tbody.removeChild(tr.nextElementSibling);
           }
           break;
         case 4:
@@ -298,27 +270,29 @@ export default {
           break;
       }
       this.$refs['menu'].style.display = "none";
+      this.$parent.changeHTML();
     },
     operator(direction, type) {
       const table = this.$parent.$refs["richEdit"].children[0];
-      const tr = table.children[this.tableInfo.rowIndex];
+      const tbody = table.children[0];
+      const tr = tbody.children[this.tableInfo.rowIndex];
       const td = tr.children[this.tableInfo.colIndex];
-      Array.from(table.children).forEach(item => {
+      Array.from(tbody.children).forEach(item => {
         var children = Array.from(item.children);
         for (var i = 0; i < children.length; i++) {
           if (type === "deleteColumn") {
             if (direction === "before") {
-              if (i === this.tableInfo.colIndex - 1) {
+              if (i === (parseInt(this.tableInfo.colIndex) - 1)) {
                 item.removeChild(children[i]);
                 break;
               }
             } else if (direction === "after") {
-              if (i === this.tableInfo.colIndex + 1) {
+              if (i === (parseInt(this.tableInfo.colIndex) + 1)) {
                 item.removeChild(children[i]);
                 break;
               }
             } else {
-              if (i === this.tableInfo.colIndex) {
+              if (i === parseInt(this.tableInfo.colIndex)) {
                 item.removeChild(children[i]);
                 break;
               }
@@ -327,12 +301,13 @@ export default {
         }
       });
       this.$refs['menu'].style.display = "none";
-
+      this.$parent.changeHTML();
     },
     changeAlign(key, styleObj) {
       const table = this.$parent.$refs["richEdit"].children[0];
+      const tbody = table.children[0];
       this.table = table;
-      const tr = table.children[this.tableInfo.rowIndex];
+      const tr = tbody.children[this.tableInfo.rowIndex];
       const td = tr.children[this.tableInfo.colIndex];
       switch (key) {
         case 0:
@@ -341,13 +316,13 @@ export default {
           break;
         case 1:
           console.log("列排列");
-          Array.from(table.children).forEach((row, rowIndex) => {
+          Array.from(tbody.children).forEach((row, rowIndex) => {
             row.children[this.tableInfo.colIndex].style.textAlign =
               styleObj.style["text-align"];
           });
           break;
         case 2:
-          Array.from(table.children[this.tableInfo.rowIndex].children).forEach(
+          Array.from(tbody.children[this.tableInfo.rowIndex].children).forEach(
             (col, colIndex) => {
               col.style.textAlign = styleObj.style["text-align"];
             }
@@ -356,37 +331,15 @@ export default {
         default:
           break;
       }
+      this.$parent.changeHTML();
     },
-    //设置奇数行颜色
-    setOddColor() {
-      const table = this.$parent.$refs["richEdit"].children[0];
-      const tr = table.children[this.tableInfo.rowIndex];
-      const td = tr.children[this.tableInfo.colIndex];
-      var currentTableChilren = Array.from(table.children);
-      for (var i = 0; i < currentTableChilren.length; i++) {
-        if (i % 2 == 0) {
-          var item = currentTableChilren[i];
-          item.style.backgroundColor = this.oddColorObj.color;
-        }
-      }
-    },
-    //设置偶数行颜色
-    setEvenColor() {
-      const table = this.$parent.$refs["richEdit"].children[0];
-      const tr = table.children[this.tableInfo.rowIndex];
-      const td = tr.children[this.tableInfo.colIndex];
-      var currentTableChilren = Array.from(table.children);
-      for (var i = 0; i < currentTableChilren.length; i++) {
-        if (i % 2 == 1) {
-          var item = currentTableChilren[i];
-          item.style.backgroundColor = this.evenColorObject.color;
-        }
-      }
-    },
+
     setCurrentLineColor(color){
       const table = this.$parent.$refs["richEdit"].children[0];
-      const tr = table.children[this.tableInfo.rowIndex];
+      const tbody = table.children[0];
+      const tr = tbody.children[this.tableInfo.rowIndex];
       tr.style.backgroundColor = color;
+      this.$parent.changeHTML();
     },
     changeColor(color){
       console.log("颜色",color);
@@ -403,39 +356,30 @@ export default {
     mergeTd(){
       console.log("合并单元格",this.mergeList,this.rowspan,this.colspan);
       const table = this.$parent.$refs["richEdit"].children[0];
+      const tbody = table.children[0];
       let rowIndex = this.mergeList[0].split("-")[0];
       let colIndex = this.mergeList[0].split("-")[1];
       /**
        * 获取mergeList里的第一个序号，作为合并的基础单元格，然后删除其他序号对应的单元格
        */
-      let tr = table.children[rowIndex];
+      let tr = tbody.children[rowIndex];
       let td = tr.children[colIndex];
       td.colSpan = this.colspan;
       td.rowSpan = this.rowspan;
-      // const tr = table.children[this.tableInfo.rowIndex];
-      // const td = tr.children[this.tableInfo.colIndex];
-      
-      const tableChildren = Array.from(table.children);
-      // const deleArr = [];
+      td.style.border = "1px solid lightgray";
+      const tbodyChildren = Array.from(tbody.children);
       for(let i=1;i<this.mergeList.length;i++){
         rowIndex = this.mergeList[i].split("-")[0];
         colIndex = this.mergeList[i].split("-")[1];
-        tr = tableChildren[rowIndex];
+        tr = tbodyChildren[rowIndex];
         td = tr.children[colIndex];
         const delObj = {
           'tr':tr,
           'td':td
         }
-        // deleArr.push(delObj);
-        // if(td){
-        //   tr.removeChild(td);
-        // }
         td.style.display = 'none';
       }
-      // console.log("要删除的元素列表",deleArr);
-      // deleArr.forEach((item,index)=>{
-      //   item['tr'].removeChild(item['td'])
-      // })
+      this.$parent.changeHTML();
     },
     /**
      * @description 设置css样式结束
