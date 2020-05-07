@@ -471,6 +471,7 @@ ul {
   font-size: 12px;
   border: 1px solid lightgray;
   display: none;
+  z-index: 11111;
 }
 #menu li {
   height: 30px;

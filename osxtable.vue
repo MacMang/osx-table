@@ -111,6 +111,10 @@ export default {
     isEdit: {
       type: Boolean,
       default: true
+    },
+    content: {
+      type: String,
+      default: ''
     }
   },
   data() {
@@ -139,10 +143,12 @@ export default {
       }
     };
   },
-  
+
   mounted() {
     this.backupRange();
-    this.insertTable();
+    if(!this.content){
+      this.insertTable();
+    }
     let richEdit = this.$refs["richEdit"];
     let tableMenu = this.$refs["table-menu"].$el;
     //选择元素
@@ -233,16 +239,22 @@ export default {
       tableMenu.style.display = "block";
       if((w-mouseClientX)<300){
         tableMenu.style.top = (oEvent.clientY) + "px";
-        tableMenu.style.left = (mouseClientX-110) + "px";
+        tableMenu.style.left = (mouseClientX-200) + "px";
       }else{
         tableMenu.style.top = oEvent.clientY + "px";
-        tableMenu.style.left = oEvent.clientX + "px";
+        tableMenu.style.left = (mouseClientX-80) + "px";
         tableMenu.style.right = ''; 
       }
       this.slideDirection = (w-mouseClientX);
       console.log("弹框位置",this.slideDirection);
       return false;
     };
+  },
+  watch: {
+    content(val){
+      const richEdit = this.$refs['richEdit'];
+      richEdit.innerHTML = val;
+    }
   },
   methods: {
     backupRange(text) {
